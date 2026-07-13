@@ -8,24 +8,28 @@
         <div class="wd-label" data-reveal="fade-up">Guest Wishes</div>
         <h2 class="wd-heading" data-reveal="fade-up" data-delay="1">Words from our favorite people</h2>
 
-        <div class="wd-wish-list">
-            @if (_wishes.Count == 0)
+        @* Lời chúc trôi từ phải sang trái như bình luận trên nền tảng stream.
+           3 làn tốc độ khác nhau; di chuột (desktop) thì làn đó dừng để đọc. *@
+        <div class="wd-wish-ticker" data-reveal="fade-in">
+            @for (var lane = 0; lane < LaneCount; lane++)
             {
-                <p class="wd-wishes-empty" data-reveal="fade-up">
-                    Hãy là người đầu tiên gửi lời chúc tới hai chúng mình nhé!
-                </p>
-            }
-            else
-            {
-                var delay = 0;
-                @foreach (var wish in _wishes)
-                {
-                    <blockquote class="wd-wish @(wish == _justSent ? "wd-wish--new" : null)"
-                                data-reveal="fade-up" data-delay="@(Math.Min(delay++, 3))">
-                        <p class="wd-wish-content">@wish.Content</p>
-                        <footer class="wd-wish-name">@wish.GuestName</footer>
-                    </blockquote>
-                }
+                var items = BuildLane(lane);
+                <div class="wd-ticker-lane" style="--lane-duration:@(26 + lane * 9)s">
+                    <div class="wd-ticker-track">
+                        @* Nội dung nhân đôi để vòng lặp liền mạch *@
+                        @for (var copy = 0; copy < 2; copy++)
+                        {
+                            @foreach (var wish in items)
+                            {
+                                <span class="wd-wish-bubble @(wish == _justSent && copy == 0 ? "wd-wish--new" : null)"
+                                      aria-hidden="@(copy == 1)">
+                                    <span class="wd-bubble-name">@wish.GuestName</span>
+                                    <span class="wd-bubble-content">@wish.Content</span>
+                                </span>
+                            }
+                        }
+                    </div>
+                </div>
             }
         </div>
 
@@ -89,10 +93,31 @@
         "Chúc hai vợ chồng son hạnh phúc viên mãn, sớm có tin vui!",
     ];
 
+    private const int LaneCount = 3;
+
     private GuestWishDto _model = new();
     private List<GuestWishDto> _wishes = [];
     private GuestWishDto? _justSent;
     private bool _sending, _sent, _error, _profanity;
+
+    // Lời chúc thật của khách hiện trước, sau đó tới bộ lời chúc mở màn
+    private List<GuestWishDto> DisplayWishes =>
+    [
+        .. _wishes,
+        .. WeddingContent.StarterWishes.Select(s => new GuestWishDto { GuestName = s.Name, Content = s.Content }),
+    ];
+
+    // Chia lời chúc vào các làn kiểu round-robin; làn ngắn quá thì lặp lại
+    // cho đủ dày để vòng chạy không bị hở.
+    private List<GuestWishDto> BuildLane(int lane)
+    {
+        var all = DisplayWishes;
+        var items = new List<GuestWishDto>();
+        for (var i = lane; i < all.Count; i += LaneCount) items.Add(all[i]);
+        if (items.Count == 0) return items;
+        while (items.Count < 4) items.AddRange(items.ToArray());
+        return items;
+    }
 
     protected override async Task OnInitializedAsync()
         => _wishes = await Api.GetWishesAsync(Slug);

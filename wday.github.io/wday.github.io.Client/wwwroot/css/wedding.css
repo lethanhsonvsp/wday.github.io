@@ -811,7 +811,12 @@ a { color: inherit; }
 }
 
 /* ---- 16. Forms (RSVP + Wishes) ------------------------------------------- */
-.wd-rsvp { background: var(--warm-white); }
+/* Nền ảnh cưới phủ lớp trắng ấm nhẹ — đồng bộ với Date/Wishes */
+.wd-rsvp {
+    background:
+        linear-gradient(rgba(250, 246, 240, .93), rgba(250, 246, 240, .93)),
+        url("../images/gallery/wedding-07.jpg") center 20% / cover no-repeat;
+}
 .wd-rsvp-quote {
     font-family: var(--font-serif);
     font-style: italic;
@@ -908,45 +913,67 @@ a { color: inherit; }
         linear-gradient(rgba(245, 237, 225, .95), rgba(245, 237, 225, .95)),
         url("../images/gallery/wedding-12.jpg") center / cover no-repeat;
 }
-.wd-wish-list {
-    max-width: 44rem;
-    margin: clamp(2.5rem, 6vw, 4rem) auto 0;
+/* Dải lời chúc trôi phải → trái như bình luận stream */
+.wd-wish-ticker {
+    margin: clamp(2.5rem, 6vw, 4rem) calc(clamp(1.25rem, 5vw, 3rem) * -1) 0; /* tràn hết bề ngang section */
     display: grid;
-    gap: 2.6rem;
+    gap: .9rem;
+    /* mờ dần hai mép cho cảm giác trôi vào/ra */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
 }
-.wd-wish {
-    text-align: center;
-    padding: 0 1rem;
+.wd-ticker-lane { overflow: hidden; }
+.wd-ticker-track {
+    display: inline-flex;
+    width: max-content;
+    animation: wd-ticker var(--lane-duration, 30s) linear infinite;
+    will-change: transform;
 }
-.wd-wish-content {
+@keyframes wd-ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); } /* nội dung nhân đôi → -50% là tròn một vòng */
+}
+@media (hover: hover) {
+    .wd-ticker-lane:hover .wd-ticker-track { animation-play-state: paused; }
+}
+.wd-wish-bubble {
+    flex: none;
+    display: inline-flex;
+    align-items: baseline;
+    gap: .6rem;
+    max-width: min(78vw, 30rem);
+    margin-right: .9rem;
+    padding: .55rem 1.15rem;
+    background: rgba(255, 255, 240, .78);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    white-space: nowrap;
+}
+.wd-bubble-name {
+    font-family: var(--font-sans);
+    font-size: .58rem;
+    font-weight: 600;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--rose-deep);
+}
+.wd-bubble-content {
     font-family: var(--font-serif);
     font-style: italic;
-    font-size: clamp(1.15rem, 3vw, 1.45rem);
-    line-height: 1.6;
+    font-size: 1.02rem;
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.wd-wish-content::before { content: "“"; color: var(--rose); }
-.wd-wish-content::after  { content: "”"; color: var(--rose); }
-.wd-wish-name {
-    font-family: var(--font-sans);
-    font-size: .66rem;
-    font-weight: 500;
-    letter-spacing: .32em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin-top: .9rem;
-}
-.wd-wish + .wd-wish {
-    border-top: 1px solid var(--line);
-    padding-top: 2.6rem;
-}
-/* Lời chúc vừa gửi — hiện ra với animation nở nhẹ */
+/* Lời chúc vừa gửi — nở sáng nhẹ để nhận ra ngay trong dòng chảy */
 .wd-wish--new {
-    animation: wd-wish-pop .9s var(--ease-out);
+    animation: wd-wish-pop 1.6s var(--ease-out);
+    border-color: var(--rose-deep);
 }
 @keyframes wd-wish-pop {
-    0%   { opacity: 0; transform: translateY(1.2rem) scale(.96); }
-    60%  { opacity: 1; transform: translateY(-.15rem) scale(1.01); }
-    100% { opacity: 1; transform: none; }
+    0%   { box-shadow: 0 0 0 0 rgba(176, 133, 133, .5); transform: scale(.92); }
+    45%  { box-shadow: 0 0 0 10px rgba(176, 133, 133, 0); transform: scale(1.03); }
+    100% { box-shadow: 0 0 0 0 rgba(176, 133, 133, 0); transform: none; }
 }
 
 /* Mẫu câu gợi ý */
@@ -1169,6 +1196,30 @@ a { color: inherit; }
 .wd-music-btn.is-playing svg { animation: wd-spin 9s linear infinite; } /* icon xoay rất chậm */
 @keyframes wd-spin { to { transform: rotate(360deg); } }
 
+/* ---- 20b. Cánh hoa hồng rơi ----------------------------------------------------------- */
+#wd-petals {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 90; /* dưới opening (100), music (120), lightbox (200) */
+}
+.wd-petal {
+    position: absolute;
+    top: -7vh;
+    background: linear-gradient(135deg, #F0CBCB 20%, rgba(201, 160, 160, .65));
+    border-radius: 150% 30% 150% 30%; /* dáng cánh hoa */
+    animation: wd-petal-fall linear infinite;
+    will-change: transform;
+}
+@keyframes wd-petal-fall {
+    0%   { transform: translate3d(0, -7vh, 0) rotate(0turn); }
+    25%  { transform: translate3d(var(--sway, 4vw), 22vh, 0) rotate(.3turn); }
+    50%  { transform: translate3d(calc(var(--sway, 4vw) * -.6), 48vh, 0) rotate(.55turn); }
+    75%  { transform: translate3d(var(--sway, 4vw), 76vh, 0) rotate(.85turn); }
+    100% { transform: translate3d(calc(var(--sway, 4vw) * -.3), 110vh, 0) rotate(1.15turn); }
+}
+
 /* ---- 21. NotFound ------------------------------------------------------------------- */
 .wd-notfound {
     min-height: 100svh;
@@ -1191,4 +1242,7 @@ a { color: inherit; }
     .wd-image-reveal::after { display: none; }
     .wd-image-reveal img { transform: none; }
     .wd-cinematic { background-attachment: scroll; }
+    #wd-petals { display: none; }
+    .wd-ticker-track { animation: none; }
+    .wd-ticker-lane { overflow-x: auto; } /* vẫn đọc được bằng cách kéo ngang */
 }

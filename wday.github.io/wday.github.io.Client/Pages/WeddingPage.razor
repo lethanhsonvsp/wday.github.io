@@ -35,6 +35,7 @@
 
     private bool _opened;
     private bool _skipOpening;
+    private bool _petalsStarted;
     private WeddingMusicPlayer? _music;
 
     protected override void OnInitialized()
@@ -69,6 +70,12 @@
         {
             // Deep-link dạng /wedding/slug?open=1#gallery — cuộn tới section sau khi render
             await Js.InvokeVoidAsync("wedding.scrollToFragment");
+        }
+
+        if (_opened && !_petalsStarted)
+        {
+            _petalsStarted = true;
+            await Js.InvokeVoidAsync("wedding.initPetals"); // cánh hoa rơi sau khi mở thiệp
         }
     }
 }

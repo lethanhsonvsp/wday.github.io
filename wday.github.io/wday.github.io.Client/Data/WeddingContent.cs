@@ -86,6 +86,26 @@ public static class WeddingContent
             WeddingImages.Story2026),
     ];
 
+    // ---- Lời chúc mở màn -----------------------------------------------
+    // Hiển thị trong dải lời chúc trôi (danmaku) để section luôn sống động,
+    // kể cả khi chưa có khách gửi. Lời chúc thật của khách luôn hiện trước.
+
+    public record StarterWish(string Name, string Content);
+
+    public static readonly StarterWish[] StarterWishes =
+    [
+        new("Gia đình hai bên", "Chúc hai con trăm năm hạnh phúc, sớm có tin vui! 💕"),
+        new("Hội bạn thân", "Cuối cùng cũng cưới! Chúc hai bạn mãi ngọt ngào như ngày đầu 🥂"),
+        new("Minh Anh", "Chúc anh chị về chung một nhà luôn ngập tiếng cười."),
+        new("Quang Huy", "Đầu bạc răng long, con đàn cháu đống nhé hai bạn!"),
+        new("Thu Trang", "Chúc mừng đám cưới! Hạnh phúc viên mãn nha 💐"),
+        new("Đồng nghiệp chú rể", "Chúc sếp và chị nhà mãi yêu thương, sự nghiệp thăng hoa!"),
+        new("Ngọc Hà", "Yêu thương đong đầy, hạnh phúc bền lâu nhé!"),
+        new("Bạn học cô dâu", "Cô dâu xinh nhất hôm nay! Chúc hai bạn hạnh phúc mãi mãi ✨"),
+        new("Văn Nam", "Chúc hai bạn một đời bình an, một nhà ấm áp."),
+        new("Cô chú Út", "Mong hai con luôn nắm chặt tay nhau qua mọi buồn vui."),
+    ];
+
     // ---- Mừng cưới (QR ngân hàng) — TODO: thay bằng thông tin thật ----
 
     public record BankAccount(string Owner, string Role, string Bank, string AccountNumber);

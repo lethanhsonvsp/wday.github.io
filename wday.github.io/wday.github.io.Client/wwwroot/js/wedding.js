@@ -159,6 +159,32 @@ window.wedding = (function () {
         window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
     }
 
+    // ---- Cánh hoa hồng nhạt rơi toàn trang -------------------------------
+    function initPetals() {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        if (document.getElementById("wd-petals")) return;
+
+        const host = document.createElement("div");
+        host.id = "wd-petals";
+        host.setAttribute("aria-hidden", "true");
+
+        const count = Math.min(16, Math.max(10, Math.floor(window.innerWidth / 90)));
+        for (let i = 0; i < count; i++) {
+            const petal = document.createElement("span");
+            petal.className = "wd-petal";
+            const size = 9 + Math.random() * 9;
+            petal.style.left = (Math.random() * 100).toFixed(1) + "vw";
+            petal.style.width = size.toFixed(1) + "px";
+            petal.style.height = (size * 1.3).toFixed(1) + "px";
+            petal.style.setProperty("--sway", (2 + Math.random() * 5).toFixed(1) + "vw");
+            petal.style.animationDuration = (10 + Math.random() * 10).toFixed(1) + "s";
+            petal.style.animationDelay = (-Math.random() * 20).toFixed(1) + "s"; // delay âm: rải đều ngay từ đầu
+            petal.style.opacity = (0.3 + Math.random() * 0.35).toFixed(2);
+            host.appendChild(petal);
+        }
+        document.body.appendChild(host);
+    }
+
     // Cuộn tới #fragment sau khi Blazor render xong (deep-link vào từng section)
     function scrollToFragment() {
         const id = location.hash.slice(1);
@@ -178,6 +204,7 @@ window.wedding = (function () {
         copyText,
         makeQr,
         scrollToTop,
-        scrollToFragment
+        scrollToFragment,
+        initPetals
     };
 })();

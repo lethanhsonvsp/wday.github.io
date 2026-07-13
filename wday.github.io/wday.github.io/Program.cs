@@ -76,7 +76,7 @@ app.MapGet("/api/weddings/{slug}/wishes", async (string slug, WeddingDbContext d
     var wishes = await db.GuestWishes.AsNoTracking()
         .Where(w => w.WeddingId == wedding.Id)
         .OrderByDescending(w => w.CreatedAt)
-        .Take(100)
+        .Take(200)
         .Select(w => new GuestWishDto { GuestName = w.GuestName, Content = w.Content, CreatedAt = w.CreatedAt })
         .ToListAsync();
 
