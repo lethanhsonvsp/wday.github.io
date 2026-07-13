@@ -233,6 +233,7 @@ a { color: inherit; }
 .wd-opening-content {
     position: relative;
     z-index: 1;
+    max-width: 100%; /* grid item không được tràn viewport */
     padding: 1.5rem;
     animation: wd-fade-up-in 1.4s var(--ease-out) .3s both;
 }
@@ -242,11 +243,26 @@ a { color: inherit; }
 }
 .wd-opening .wd-label { color: var(--champagne); }
 .wd-opening-names {
+    display: flex;
+    flex-wrap: wrap; /* màn hẹp: tự tách "Ngọc Nam &" / "Lan Anh" */
+    justify-content: center;
+    align-items: baseline;
+    column-gap: .32em;
     font-family: var(--font-script);
-    font-size: clamp(3rem, 11vw, 5.5rem);
+    font-size: clamp(2.4rem, 10vw, 5.5rem);
     line-height: 1.25;
     margin: 1.4rem 0 .6rem;
     text-shadow: 0 2px 24px rgba(0, 0, 0, .35);
+}
+.wd-opening-names .amp { color: var(--champagne); }
+/* Màn hẹp: xếp tên thành 3 dòng "Ngọc Nam / & / Lan Anh" cho chắc chắn không tràn */
+@media (max-width: 620px) {
+    .wd-opening-names {
+        flex-direction: column;
+        align-items: center;
+        row-gap: .05em;
+    }
+    .wd-opening-names .amp { font-size: .55em; }
 }
 .wd-opening-date {
     font-family: var(--font-sans);
@@ -304,7 +320,7 @@ a { color: inherit; }
     z-index: -1;
     background: linear-gradient(rgba(35, 28, 24, .18) 0%, rgba(35, 28, 24, .28) 55%, rgba(35, 28, 24, .55) 100%);
 }
-.wd-hero-content { padding: 1.5rem; }
+.wd-hero-content { padding: 1.5rem; max-width: 100%; }
 .wd-hero .wd-label { color: var(--cream); }
 .wd-hero-names {
     font-family: var(--font-display);
@@ -772,6 +788,7 @@ a { color: inherit; }
 .wd-cinematic-quote {
     position: relative;
     z-index: 1;
+    max-width: min(46rem, 100%);
     font-family: var(--font-serif);
     font-style: italic;
     font-size: clamp(1.6rem, 5vw, 3rem);

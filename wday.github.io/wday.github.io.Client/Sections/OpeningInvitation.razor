@@ -4,7 +4,11 @@
     <div class="wd-opening-bg" style="background-image:url('@WeddingImages.OpeningBackground')"></div>
     <div class="wd-opening-content">
         <div class="wd-label">Save The Date</div>
-        <h1 class="wd-opening-names">@WeddingContent.CoupleNames</h1>
+        <h1 class="wd-opening-names">
+            <span>@WeddingContent.GroomName</span>
+            <span class="amp">&amp;</span>
+            <span>@WeddingContent.BrideName</span>
+        </h1>
         <div class="wd-opening-date">@WeddingContent.DateDisplay</div>
         <button type="button" class="wd-open-btn" @onclick="OpenAsync">Mở thiệp</button>
     </div>

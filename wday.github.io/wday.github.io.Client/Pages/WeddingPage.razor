@@ -1,9 +1,13 @@
 @page "/wedding/{Slug}"
 @inject IJSRuntime Js
+@inject NavigationManager Nav
 
 <PageTitle>@WeddingContent.CoupleNames — @WeddingContent.DateDisplay</PageTitle>
 
-<OpeningInvitation OnOpened="HandleOpened" />
+@if (!_skipOpening)
+{
+    <OpeningInvitation OnOpened="HandleOpened" />
+}
 
 @if (_opened)
 {
@@ -30,7 +34,19 @@
     [Parameter] public string Slug { get; set; } = WeddingContent.Slug;
 
     private bool _opened;
+    private bool _skipOpening;
     private WeddingMusicPlayer? _music;
+
+    protected override void OnInitialized()
+    {
+        // ?open=1 bỏ qua màn mở thiệp (dùng khi khách quay lại xem / khi test)
+        var query = new Uri(Nav.Uri).Query;
+        if (query.Contains("open=1", StringComparison.OrdinalIgnoreCase))
+        {
+            _skipOpening = true;
+            _opened = true;
+        }
+    }
 
     private async Task HandleOpened()
     {
@@ -48,5 +64,11 @@
     {
         // Gọi sau mỗi render để observe các section mới xuất hiện
         await Js.InvokeVoidAsync("wedding.initReveal");
+
+        if (firstRender && _opened)
+        {
+            // Deep-link dạng /wedding/slug?open=1#gallery — cuộn tới section sau khi render
+            await Js.InvokeVoidAsync("wedding.scrollToFragment");
+        }
     }
 }

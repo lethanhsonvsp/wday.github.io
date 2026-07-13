@@ -24,8 +24,9 @@ window.wedding = (function () {
     }
 
     function initReveal() {
-        // Nếu người dùng tắt animation thì hiện tất cả ngay lập tức
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        // Nếu người dùng tắt animation (hoặc ?noanim=1 khi test) thì hiện tất cả ngay lập tức
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+            new URLSearchParams(location.search).has("noanim")) {
             document.querySelectorAll("[data-reveal]").forEach((el) => el.classList.add("is-visible"));
             return;
         }
@@ -158,6 +159,14 @@ window.wedding = (function () {
         window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
     }
 
+    // Cuộn tới #fragment sau khi Blazor render xong (deep-link vào từng section)
+    function scrollToFragment() {
+        const id = location.hash.slice(1);
+        if (!id) return;
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: "auto", block: "start" });
+    }
+
     return {
         initReveal,
         audioPlay,
@@ -168,6 +177,7 @@ window.wedding = (function () {
         lightboxDetach,
         copyText,
         makeQr,
-        scrollToTop
+        scrollToTop,
+        scrollToFragment
     };
 })();
