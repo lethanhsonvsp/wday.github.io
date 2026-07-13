@@ -44,16 +44,22 @@ public static class WeddingContent
 
     public static readonly WeddingEvent[] Events =
     [
+        new("LỄ VU QUY", "18 . 10 . 2026", "08:00",
+            "Tư gia nhà gái",
+            "Thôn Đông Thịnh, Xã Hoằng Lộc, Tỉnh Thanh Hóa", // TODO: thay địa chỉ nhà gái thật
+            "https://maps.google.com/?q=Hoang+Loc+Thanh+Hoa", // TODO: thay link Google Maps thật
+            WeddingImages.EventVuQuy),
+
         new("LỄ THÀNH HÔN", "18 . 10 . 2026", "10:30",
             "Tư gia nhà trai",
-            "Thôn Xuân Phú, Xã Xuân Hòa, Tỉnh Thanh Hóa", // TODO: thay địa chỉ thật
+            "Thôn Xuân Phú, Xã Xuân Hòa, Tỉnh Thanh Hóa", // TODO: thay địa chỉ nhà trai thật
             "https://maps.google.com/?q=Thanh+Hoa",       // TODO: thay link Google Maps thật
             WeddingImages.EventCeremony),
 
         new("TIỆC CƯỚI", "18 . 10 . 2026", "17:30",
-            "Trung tâm tiệc cưới Diamond Palace",          // TODO: thay tên nhà hàng thật
-            "Số 15 Đại lộ Lê Lợi, Phường Hạc Thành, Tỉnh Thanh Hóa", // TODO: thay địa chỉ thật
-            "https://maps.google.com/?q=Le+Loi+Thanh+Hoa", // TODO: thay link Google Maps thật
+            "Tổ chức tại tư gia nhà trai",
+            "Thôn Xuân Phú, Xã Xuân Hòa, Tỉnh Thanh Hóa", // TODO: cùng địa chỉ nhà trai
+            "https://maps.google.com/?q=Thanh+Hoa",       // TODO: thay link Google Maps thật
             WeddingImages.EventParty),
     ];
 

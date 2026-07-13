@@ -1,5 +1,7 @@
-@* Section 12 — Lời chúc của khách, kiểu trích dẫn tạp chí *@
+@* Section 12 — Lời chúc của khách, kiểu trích dẫn tạp chí.
+   Có mẫu câu gợi ý, lọc từ thô tục, animation khi lời chúc xuất hiện. *@
 @inject WeddingApiClient Api
+@inject IJSRuntime Js
 
 <section id="wishes" class="wd-section wd-wishes">
     <div class="wd-container">
@@ -15,9 +17,11 @@
             }
             else
             {
+                var delay = 0;
                 @foreach (var wish in _wishes)
                 {
-                    <blockquote class="wd-wish" data-reveal="fade-up">
+                    <blockquote class="wd-wish @(wish == _justSent ? "wd-wish--new" : null)"
+                                data-reveal="fade-up" data-delay="@(Math.Min(delay++, 3))">
                         <p class="wd-wish-content">@wish.Content</p>
                         <footer class="wd-wish-name">@wish.GuestName</footer>
                     </blockquote>
@@ -48,11 +52,24 @@
                     <ValidationMessage For="() => _model.Content" class="wd-form-error" />
                 </div>
 
+                @* Mẫu câu gợi ý — chạm để dùng *@
+                <div class="wd-wish-samples">
+                    <span class="wd-wish-samples-label">Gợi ý nhanh:</span>
+                    @foreach (var sample in SampleWishes)
+                    {
+                        <button type="button" class="wd-wish-chip" @onclick="() => UseSample(sample)">@sample</button>
+                    }
+                </div>
+
                 <button type="submit" class="wd-submit-btn" disabled="@_sending">
                     @(_sending ? "Đang gửi…" : "Gửi lời chúc")
                 </button>
 
-                @if (_error)
+                @if (_profanity)
+                {
+                    <p class="wd-form-error">Lời chúc có từ ngữ chưa phù hợp với ngày vui, bạn chỉnh lại giúp mình nhé 💕</p>
+                }
+                else if (_error)
                 {
                     <p class="wd-form-error">Không gửi được, bạn thử lại giúp mình nhé.</p>
                 }
@@ -64,23 +81,50 @@
 @code {
     [Parameter] public string Slug { get; set; } = WeddingContent.Slug;
 
+    private static readonly string[] SampleWishes =
+    [
+        "Chúc hai bạn trăm năm hạnh phúc, đầu bạc răng long! 💕",
+        "Chúc mừng đám cưới! Mong hai bạn mãi yêu thương nhau như ngày đầu.",
+        "Chúc anh chị về chung một nhà luôn ngập tiếng cười và yêu thương.",
+        "Chúc hai vợ chồng son hạnh phúc viên mãn, sớm có tin vui!",
+    ];
+
     private GuestWishDto _model = new();
     private List<GuestWishDto> _wishes = [];
-    private bool _sending, _sent, _error;
+    private GuestWishDto? _justSent;
+    private bool _sending, _sent, _error, _profanity;
 
     protected override async Task OnInitializedAsync()
         => _wishes = await Api.GetWishesAsync(Slug);
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Danh sách lời chúc load async sau khi trang render — tự observe lại
+        // để các phần tử data-reveal mới xuất hiện có animation.
+        await Js.InvokeVoidAsync("wedding.initReveal");
+    }
+
+    private void UseSample(string sample)
+    {
+        _model.Content = sample;
+        _profanity = false;
+    }
+
     private async Task SubmitAsync()
     {
-        _sending = true;
         _error = false;
+        _profanity = ProfanityFilter.ContainsProfanity(_model.Content)
+                  || ProfanityFilter.ContainsProfanity(_model.GuestName);
+        if (_profanity) return;
+
+        _sending = true;
         try
         {
             _sent = await Api.SendWishAsync(Slug, _model);
             if (_sent)
             {
-                _wishes.Insert(0, _model); // hiện ngay lời chúc mới gửi
+                _justSent = _model;
+                _wishes.Insert(0, _model); // lời chúc mới hiện ngay đầu danh sách kèm animation
                 _model = new();
             }
             else

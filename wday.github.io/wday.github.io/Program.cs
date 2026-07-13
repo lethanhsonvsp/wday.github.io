@@ -49,6 +49,8 @@ app.MapGet("/api/weddings/{slug}", async (string slug, WeddingDbContext db) =>
 app.MapPost("/api/weddings/{slug}/rsvp", async (string slug, RsvpRequest request, WeddingDbContext db) =>
 {
     if (string.IsNullOrWhiteSpace(request.GuestName)) return Results.BadRequest();
+    if (ProfanityFilter.ContainsProfanity(request.GuestName) || ProfanityFilter.ContainsProfanity(request.Message))
+        return Results.BadRequest("Nội dung có từ ngữ chưa phù hợp.");
 
     var wedding = await db.Weddings.FirstOrDefaultAsync(w => w.Slug == slug);
     if (wedding is null) return Results.NotFound();
@@ -85,6 +87,8 @@ app.MapPost("/api/weddings/{slug}/wishes", async (string slug, GuestWishDto wish
 {
     if (string.IsNullOrWhiteSpace(wish.GuestName) || string.IsNullOrWhiteSpace(wish.Content))
         return Results.BadRequest();
+    if (ProfanityFilter.ContainsProfanity(wish.GuestName) || ProfanityFilter.ContainsProfanity(wish.Content))
+        return Results.BadRequest("Nội dung có từ ngữ chưa phù hợp.");
 
     var wedding = await db.Weddings.FirstOrDefaultAsync(w => w.Slug == slug);
     if (wedding is null) return Results.NotFound();

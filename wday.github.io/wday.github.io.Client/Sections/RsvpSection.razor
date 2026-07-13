@@ -55,7 +55,11 @@
                     @(_sending ? "Đang gửi…" : "Gửi xác nhận")
                 </button>
 
-                @if (_error)
+                @if (_profanity)
+                {
+                    <p class="wd-form-error">Lời nhắn có từ ngữ chưa phù hợp với ngày vui, bạn chỉnh lại giúp mình nhé 💕</p>
+                }
+                else if (_error)
                 {
                     <p class="wd-form-error">Không gửi được, bạn thử lại giúp mình nhé.</p>
                 }
@@ -68,12 +72,16 @@
     [Parameter] public string Slug { get; set; } = WeddingContent.Slug;
 
     private readonly RsvpRequest _model = new();
-    private bool _sending, _sent, _error;
+    private bool _sending, _sent, _error, _profanity;
 
     private async Task SubmitAsync()
     {
-        _sending = true;
         _error = false;
+        _profanity = ProfanityFilter.ContainsProfanity(_model.Message)
+                  || ProfanityFilter.ContainsProfanity(_model.GuestName);
+        if (_profanity) return;
+
+        _sending = true;
         try
         {
             _sent = await Api.SendRsvpAsync(Slug, _model);

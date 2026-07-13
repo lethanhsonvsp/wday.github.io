@@ -19,6 +19,7 @@ public static class WeddingImages
     public const string Story2021         = $"{Dir}/wedding-12.jpg";
     public const string Story2025         = $"{Dir}/wedding-11.jpg";  // cảnh quỳ gối — lời cầu hôn
     public const string Story2026         = $"{Dir}/wedding-03.jpg";  // hôn lễ trong nhà thờ
+    public const string EventVuQuy        = $"{Dir}/wedding-10.webp"; // cô dâu — lễ nhà gái
     public const string EventCeremony     = $"{Dir}/wedding-06.jpg";
     public const string EventParty        = $"{Dir}/wedding-04.jpg";
     public const string Cinematic         = $"{Dir}/wedding-08.webp"; // dọc, tông trầm — nền quote
