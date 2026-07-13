@@ -1,0 +1,24 @@
+@* Section 8 — Chuyện tình yêu: timeline tự thiết kế, ảnh lệch nhẹ kiểu scrapbook *@
+
+<section class="wd-section wd-story">
+    <div class="wd-container">
+        <div class="wd-label" data-reveal="fade-up">Our Love Story</div>
+        <h2 class="wd-heading" data-reveal="fade-up" data-delay="1">Chuyện của chúng mình</h2>
+
+        <div class="wd-story-list">
+            @foreach (var m in WeddingContent.LoveStory)
+            {
+                <article class="wd-milestone">
+                    <div class="wd-milestone-photo wd-image-reveal" data-reveal="fade-in">
+                        <img src="@m.Image" alt="@m.Title" loading="lazy" />
+                    </div>
+                    <div class="wd-milestone-text-wrap" data-reveal="fade-up">
+                        <div class="wd-milestone-year">@m.Year</div>
+                        <h3 class="wd-milestone-title">@m.Title</h3>
+                        <p class="wd-milestone-text">@m.Text</p>
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+</section>

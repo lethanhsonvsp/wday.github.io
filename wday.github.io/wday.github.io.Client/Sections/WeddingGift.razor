@@ -1,0 +1,82 @@
+@* Section 13 — Mừng cưới: modal tự viết + QR (qrcode.js, fallback hiện chữ) *@
+@inject IJSRuntime Js
+
+<section class="wd-section wd-gift">
+    <div class="wd-container">
+        <div class="wd-label" data-reveal="fade-up">Wedding Gift</div>
+        <h2 class="wd-heading" data-reveal="fade-up" data-delay="1">Gửi quà mừng cưới</h2>
+        <p class="wd-gift-note" data-reveal="fade-up" data-delay="2">
+            Món quà lớn nhất là sự hiện diện của bạn. Nhưng nếu bạn muốn gửi chút yêu thương,
+            chúng mình xin trân trọng đón nhận.
+        </p>
+
+        <div class="wd-gift-choices" data-reveal="fade-up" data-delay="3">
+            <button type="button" class="wd-gift-btn" @onclick="() => OpenModalAsync(WeddingContent.GroomBank)">Chú rể</button>
+            <button type="button" class="wd-gift-btn" @onclick="() => OpenModalAsync(WeddingContent.BrideBank)">Cô dâu</button>
+        </div>
+    </div>
+</section>
+
+@if (_account is { } acc)
+{
+    <div class="wd-modal-backdrop" @onclick="CloseModal">
+        <div class="wd-modal" role="dialog" aria-modal="true" aria-label="Thông tin mừng cưới @acc.Owner" @onclick:stopPropagation>
+            <button type="button" class="wd-modal-close" aria-label="Đóng" @onclick="CloseModal">
+                <svg width="16" height="16" viewBox="0 0 16 16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+                    <path d="M2 2 L 14 14 M14 2 L 2 14" />
+                </svg>
+            </button>
+
+            <div class="wd-modal-role">@acc.Role</div>
+            <div class="wd-modal-name">@acc.Owner</div>
+
+            <div class="wd-qr-box" id="wd-qr-box">
+                @if (!_qrRendered)
+                {
+                    <span style="font-size:.85rem;color:var(--ink-soft)">Quét mã hoặc chuyển khoản theo thông tin dưới đây</span>
+                }
+            </div>
+
+            <p class="wd-bank-line">@acc.Bank</p>
+            <p class="wd-bank-line"><strong>@acc.AccountNumber</strong></p>
+            <p class="wd-bank-line">@acc.Owner</p>
+
+            <button type="button" class="wd-copy-btn" @onclick="CopyAccountAsync">
+                @(_copied ? "Đã sao chép ✓" : "Sao chép số tài khoản")
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    private WeddingContent.BankAccount? _account;
+    private bool _qrRendered, _qrPending, _copied;
+
+    private Task OpenModalAsync(WeddingContent.BankAccount account)
+    {
+        _account = account;
+        _copied = false;
+        _qrRendered = false;
+        _qrPending = true; // QR vẽ ở OnAfterRenderAsync khi hộp QR đã có trong DOM
+        return Task.CompletedTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_qrPending && _account is { } acc)
+        {
+            _qrPending = false;
+            var qrText = $"{acc.Bank} - {acc.AccountNumber} - {acc.Owner}";
+            _qrRendered = await Js.InvokeAsync<bool>("wedding.makeQr", "wd-qr-box", qrText);
+            StateHasChanged();
+        }
+    }
+
+    private async Task CopyAccountAsync()
+    {
+        if (_account is not { } acc) return;
+        _copied = await Js.InvokeAsync<bool>("wedding.copyText", acc.AccountNumber);
+    }
+
+    private void CloseModal() => _account = null;
+}

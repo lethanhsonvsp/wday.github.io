@@ -1,0 +1,52 @@
+@page "/wedding/{Slug}"
+@inject IJSRuntime Js
+
+<PageTitle>@WeddingContent.CoupleNames — @WeddingContent.DateDisplay</PageTitle>
+
+<OpeningInvitation OnOpened="HandleOpened" />
+
+@if (_opened)
+{
+    <main>
+        <WeddingHero />
+        <WeddingIntroduction />
+        <CoupleSection />
+        <WeddingDateSection />
+        <WeddingCountdown />
+        <WeddingEvents />
+        <LoveStory />
+        <WeddingGallery />
+        <CinematicQuote />
+        <RsvpSection Slug="@Slug" />
+        <GuestWishes Slug="@Slug" />
+        <WeddingGift />
+        <WeddingFinal />
+    </main>
+}
+
+<WeddingMusicPlayer @ref="_music" />
+
+@code {
+    [Parameter] public string Slug { get; set; } = WeddingContent.Slug;
+
+    private bool _opened;
+    private WeddingMusicPlayer? _music;
+
+    private async Task HandleOpened()
+    {
+        _opened = true;
+        StateHasChanged();
+
+        await Js.InvokeVoidAsync("wedding.scrollToTop");
+        if (_music is not null)
+        {
+            await _music.StartAsync(); // nhạc bắt đầu sau cú chạm MỞ THIỆP (thoả autoplay policy)
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Gọi sau mỗi render để observe các section mới xuất hiện
+        await Js.InvokeVoidAsync("wedding.initReveal");
+    }
+}

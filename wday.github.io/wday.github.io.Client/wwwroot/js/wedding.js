@@ -1,0 +1,173 @@
+// JavaScript tối thiểu cho thiệp cưới:
+// IntersectionObserver (scroll reveal), audio control, lightbox swipe/keyboard,
+// copy-to-clipboard, QR code. Mọi thứ khác làm bằng Blazor + CSS.
+window.wedding = (function () {
+    "use strict";
+
+    // ---- Scroll reveal -------------------------------------------------
+    let observer = null;
+
+    function ensureObserver() {
+        if (observer) return observer;
+        observer = new IntersectionObserver(
+            (entries) => {
+                for (const entry of entries) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("is-visible");
+                        observer.unobserve(entry.target);
+                    }
+                }
+            },
+            { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+        );
+        return observer;
+    }
+
+    function initReveal() {
+        // Nếu người dùng tắt animation thì hiện tất cả ngay lập tức
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            document.querySelectorAll("[data-reveal]").forEach((el) => el.classList.add("is-visible"));
+            return;
+        }
+        const obs = ensureObserver();
+        document.querySelectorAll("[data-reveal]:not(.wd-observed)").forEach((el) => {
+            el.classList.add("wd-observed");
+            obs.observe(el);
+        });
+    }
+
+    // ---- Audio -----------------------------------------------------------
+    function audioPlay(id) {
+        const el = document.getElementById(id);
+        if (!el) return Promise.resolve(false);
+        return el.play().then(() => true).catch(() => false);
+    }
+
+    function audioPause(id) {
+        const el = document.getElementById(id);
+        if (el) el.pause();
+    }
+
+    // Báo cho Blazor biết file nhạc có tồn tại không (để ẩn nút nhạc nếu thiếu)
+    function audioAvailable(id) {
+        return new Promise((resolve) => {
+            const el = document.getElementById(id);
+            if (!el) return resolve(false);
+            if (el.readyState >= 2) return resolve(true);
+            const ok = () => { cleanup(); resolve(true); };
+            const bad = () => { cleanup(); resolve(false); };
+            const cleanup = () => {
+                el.removeEventListener("canplay", ok);
+                el.removeEventListener("error", bad);
+            };
+            el.addEventListener("canplay", ok);
+            el.addEventListener("error", bad);
+            el.load();
+            setTimeout(() => { cleanup(); resolve(el.readyState >= 2); }, 4000);
+        });
+    }
+
+    // ---- Lightbox: swipe trên mobile + phím mũi tên trên desktop ---------
+    let lightboxCleanup = null;
+
+    function lightboxAttach(el, dotnetRef) {
+        lightboxDetach();
+        let startX = 0, startY = 0, tracking = false;
+
+        const onTouchStart = (e) => {
+            tracking = true;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        };
+        const onTouchEnd = (e) => {
+            if (!tracking) return;
+            tracking = false;
+            const dx = e.changedTouches[0].clientX - startX;
+            const dy = e.changedTouches[0].clientY - startY;
+            if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+                dotnetRef.invokeMethodAsync("OnLightboxSwipe", dx < 0 ? "next" : "prev");
+            }
+        };
+        const onKey = (e) => {
+            if (e.key === "ArrowRight") dotnetRef.invokeMethodAsync("OnLightboxSwipe", "next");
+            else if (e.key === "ArrowLeft") dotnetRef.invokeMethodAsync("OnLightboxSwipe", "prev");
+            else if (e.key === "Escape") dotnetRef.invokeMethodAsync("OnLightboxSwipe", "close");
+        };
+
+        el.addEventListener("touchstart", onTouchStart, { passive: true });
+        el.addEventListener("touchend", onTouchEnd, { passive: true });
+        document.addEventListener("keydown", onKey);
+        document.body.style.overflow = "hidden";
+
+        lightboxCleanup = () => {
+            el.removeEventListener("touchstart", onTouchStart);
+            el.removeEventListener("touchend", onTouchEnd);
+            document.removeEventListener("keydown", onKey);
+            document.body.style.overflow = "";
+        };
+    }
+
+    function lightboxAttachById(elementId, dotnetRef) {
+        const el = document.getElementById(elementId);
+        if (el) lightboxAttach(el, dotnetRef);
+    }
+
+    function lightboxDetach() {
+        if (lightboxCleanup) { lightboxCleanup(); lightboxCleanup = null; }
+    }
+
+    // ---- Copy to clipboard ------------------------------------------------
+    function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(text).then(() => true).catch(() => legacyCopy(text));
+        }
+        return Promise.resolve(legacyCopy(text));
+    }
+
+    function legacyCopy(text) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        let ok = false;
+        try { ok = document.execCommand("copy"); } catch { ok = false; }
+        document.body.removeChild(ta);
+        return ok;
+    }
+
+    // ---- QR code (qrcode.js qua CDN, có fallback) --------------------------
+    function makeQr(elementId, text) {
+        const el = document.getElementById(elementId);
+        if (!el || typeof window.QRCode === "undefined") return false;
+        el.innerHTML = "";
+        new window.QRCode(el, {
+            text: text,
+            width: 180,
+            height: 180,
+            colorDark: "#4a4038",
+            colorLight: "#faf6f0",
+            correctLevel: window.QRCode.CorrectLevel.M
+        });
+        return true;
+    }
+
+    // ---- Misc ---------------------------------------------------------------
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+    }
+
+    return {
+        initReveal,
+        audioPlay,
+        audioPause,
+        audioAvailable,
+        lightboxAttach,
+        lightboxAttachById,
+        lightboxDetach,
+        copyText,
+        makeQr,
+        scrollToTop
+    };
+})();

@@ -1,0 +1,23 @@
+@* Section 1 — Màn hình mở thiệp toàn màn hình *@
+
+<div class="wd-opening @(_closed ? "is-closed" : null)" aria-hidden="@_closed">
+    <div class="wd-opening-bg" style="background-image:url('@WeddingImages.OpeningBackground')"></div>
+    <div class="wd-opening-content">
+        <div class="wd-label">Save The Date</div>
+        <h1 class="wd-opening-names">@WeddingContent.CoupleNames</h1>
+        <div class="wd-opening-date">@WeddingContent.DateDisplay</div>
+        <button type="button" class="wd-open-btn" @onclick="OpenAsync">Mở thiệp</button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnOpened { get; set; }
+
+    private bool _closed;
+
+    private async Task OpenAsync()
+    {
+        _closed = true; // CSS transition tự lo phần fade-out
+        await OnOpened.InvokeAsync();
+    }
+}

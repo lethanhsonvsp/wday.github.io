@@ -1,0 +1,14 @@
+# Build output
+bin/
+obj/
+publish/
+
+# IDE
+.vs/
+*.csproj.user
+*.suo
+
+# SQLite database (dữ liệu RSVP/lời chúc local — không đưa lên repo)
+*.db
+*.db-shm
+*.db-wal

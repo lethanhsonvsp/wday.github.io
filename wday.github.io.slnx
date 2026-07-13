@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="wday.github.io/wday.github.io.Client/wday.github.io.Client.csproj" />
+  <Project Path="wday.github.io/wday.github.io/wday.github.io.csproj" />
+  <Project Path="wday.github.io/wday.github.io.Shared/wday.github.io.Shared.csproj" />
+</Solution>

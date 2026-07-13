@@ -1,0 +1,91 @@
+@* Section 11 — Xác nhận tham dự. Gửi API khi có backend, fallback localStorage trên GitHub Pages. *@
+@inject WeddingApiClient Api
+
+<section class="wd-section wd-rsvp">
+    <div class="wd-container">
+        <div class="wd-label" data-reveal="fade-up">R.S.V.P</div>
+        <h2 class="wd-heading" data-reveal="fade-up" data-delay="1">Will you join us?</h2>
+        <p class="wd-rsvp-quote" data-reveal="fade-up" data-delay="2">&ldquo;@WeddingContent.RsvpQuote&rdquo;</p>
+
+        @if (_sent)
+        {
+            <div class="wd-form-success" role="status">
+                <div class="heart" aria-hidden="true">
+                    <svg width="30" height="27" viewBox="0 0 30 27" fill="none" stroke="currentColor" stroke-width="1.2">
+                        <path d="M15 25 C 15 25, 2 16.5, 2 8.5 A 6.5 6.5 0 0 1 15 6 A 6.5 6.5 0 0 1 28 8.5 C 28 16.5, 15 25, 15 25 Z" />
+                    </svg>
+                </div>
+                <p>Cảm ơn @_model.GuestName! Chúng mình đã nhận được xác nhận của bạn.</p>
+            </div>
+        }
+        else
+        {
+            <EditForm Model="_model" OnValidSubmit="SubmitAsync" class="wd-form" data-reveal="fade-up" data-delay="3">
+                <DataAnnotationsValidator />
+
+                <div class="wd-field">
+                    <label for="rsvp-name">Tên của bạn</label>
+                    <InputText id="rsvp-name" @bind-Value="_model.GuestName" placeholder="Nguyễn Văn A" />
+                    <ValidationMessage For="() => _model.GuestName" class="wd-form-error" />
+                </div>
+
+                <div class="wd-field">
+                    <label for="rsvp-attend">Bạn sẽ tham dự?</label>
+                    <InputSelect id="rsvp-attend" @bind-Value="_model.IsAttending">
+                        <option value="true">Tôi sẽ tham dự</option>
+                        <option value="false">Rất tiếc, tôi không thể</option>
+                    </InputSelect>
+                </div>
+
+                @if (_model.IsAttending)
+                {
+                    <div class="wd-field">
+                        <label for="rsvp-count">Số người tham dự</label>
+                        <InputNumber id="rsvp-count" @bind-Value="_model.GuestCount" min="1" max="20" />
+                        <ValidationMessage For="() => _model.GuestCount" class="wd-form-error" />
+                    </div>
+                }
+
+                <div class="wd-field">
+                    <label for="rsvp-message">Lời nhắn</label>
+                    <InputTextArea id="rsvp-message" @bind-Value="_model.Message" placeholder="Đôi lời gửi tới cô dâu chú rể…" />
+                </div>
+
+                <button type="submit" class="wd-submit-btn" disabled="@_sending">
+                    @(_sending ? "Đang gửi…" : "Gửi xác nhận")
+                </button>
+
+                @if (_error)
+                {
+                    <p class="wd-form-error">Không gửi được, bạn thử lại giúp mình nhé.</p>
+                }
+            </EditForm>
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter] public string Slug { get; set; } = WeddingContent.Slug;
+
+    private readonly RsvpRequest _model = new();
+    private bool _sending, _sent, _error;
+
+    private async Task SubmitAsync()
+    {
+        _sending = true;
+        _error = false;
+        try
+        {
+            _sent = await Api.SendRsvpAsync(Slug, _model);
+            _error = !_sent;
+        }
+        catch
+        {
+            _error = true;
+        }
+        finally
+        {
+            _sending = false;
+        }
+    }
+}

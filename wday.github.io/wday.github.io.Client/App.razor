@@ -1,0 +1,13 @@
+<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Không tìm thấy</PageTitle>
+        <div class="wd-notfound">
+            <p>Không tìm thấy thiệp cưới này.</p>
+            <a href="wedding/ngoc-nam-lan-anh">Về thiệp cưới Ngọc Nam &amp; Lan Anh</a>
+        </div>
+    </NotFound>
+</Router>

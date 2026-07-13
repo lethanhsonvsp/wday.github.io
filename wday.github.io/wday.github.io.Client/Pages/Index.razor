@@ -1,0 +1,9 @@
+@page "/"
+@inject NavigationManager Nav
+
+@* Trang gốc chuyển thẳng tới thiệp cưới mặc định *@
+
+@code {
+    protected override void OnInitialized()
+        => Nav.NavigateTo($"wedding/{WeddingContent.Slug}", replace: true);
+}

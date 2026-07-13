@@ -1,0 +1,32 @@
+@* Section 4 — Cô dâu & chú rể, bố cục so le kiểu wedding magazine *@
+
+<section class="wd-section wd-couple">
+    <div class="wd-container">
+        <div class="wd-label" data-reveal="fade-up">Cô dâu &amp; Chú rể</div>
+        <h2 class="wd-heading" data-reveal="fade-up" data-delay="1">Hai con người, một câu chuyện</h2>
+
+        <div class="wd-couple-grid">
+            <article class="wd-person wd-person--groom">
+                <div class="wd-person-photo wd-image-reveal" data-reveal="fade-in">
+                    <img src="@WeddingImages.Groom" alt="Chú rể @WeddingContent.GroomName" loading="lazy" />
+                </div>
+                <div class="wd-person-text" data-reveal="reveal-right">
+                    <div class="wd-person-role">The Groom</div>
+                    <h3 class="wd-person-name">@WeddingContent.GroomName</h3>
+                    <p class="wd-person-desc">@WeddingContent.GroomDescription</p>
+                </div>
+            </article>
+
+            <article class="wd-person wd-person--bride">
+                <div class="wd-person-photo wd-image-reveal" data-reveal="fade-in">
+                    <img src="@WeddingImages.Bride" alt="Cô dâu @WeddingContent.BrideName" loading="lazy" />
+                </div>
+                <div class="wd-person-text" data-reveal="reveal-left">
+                    <div class="wd-person-role">The Bride</div>
+                    <h3 class="wd-person-name">@WeddingContent.BrideName</h3>
+                    <p class="wd-person-desc">@WeddingContent.BrideDescription</p>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
