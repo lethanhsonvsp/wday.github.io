@@ -142,16 +142,24 @@ window.wedding = (function () {
     function makeQr(elementId, text) {
         const el = document.getElementById(elementId);
         if (!el || typeof window.QRCode === "undefined") return false;
-        el.innerHTML = "";
-        new window.QRCode(el, {
-            text: text,
-            width: 180,
-            height: 180,
-            colorDark: "#4a4038",
-            colorLight: "#faf6f0",
-            correctLevel: window.QRCode.CorrectLevel.M
-        });
-        return true;
+        // qrcode.js ném "code length overflow" với chữ có dấu unicode —
+        // bắt mọi lỗi để không làm sập Blazor, fallback hiện thông tin chữ.
+        try {
+            el.innerHTML = "";
+            new window.QRCode(el, {
+                text: text,
+                width: 180,
+                height: 180,
+                colorDark: "#4a4038",
+                colorLight: "#faf6f0",
+                correctLevel: window.QRCode.CorrectLevel.M
+            });
+            return true;
+        } catch (e) {
+            console.warn("makeQr failed:", e.message);
+            el.innerHTML = "";
+            return false;
+        }
     }
 
     // ---- Misc ---------------------------------------------------------------

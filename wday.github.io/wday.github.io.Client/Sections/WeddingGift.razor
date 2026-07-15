@@ -30,7 +30,10 @@
             <div class="wd-modal-role">@acc.Role</div>
             <div class="wd-modal-name">@acc.Owner</div>
 
-            <div class="wd-qr-box" id="wd-qr-box">
+            <div class="wd-qr-box">
+                @* Node này do JS toàn quyền vẽ QR — Blazor không render gì vào trong,
+                   tránh xung đột diff (lỗi removeChild null làm sập trang) *@
+                <div id="wd-qr-target"></div>
                 @if (!_qrRendered)
                 {
                     <span style="font-size:.85rem;color:var(--ink-soft)">Quét mã hoặc chuyển khoản theo thông tin dưới đây</span>
@@ -66,10 +69,32 @@
         if (_qrPending && _account is { } acc)
         {
             _qrPending = false;
-            var qrText = $"{acc.Bank} - {acc.AccountNumber} - {acc.Owner}";
-            _qrRendered = await Js.InvokeAsync<bool>("wedding.makeQr", "wd-qr-box", qrText);
+            // Bỏ dấu tiếng Việt: nội dung chuyển khoản không cần dấu,
+            // và qrcode.js lỗi "code length overflow" với ký tự unicode có dấu
+            var qrText = RemoveDiacritics($"{acc.Bank} - {acc.AccountNumber} - {acc.Owner}");
+            try
+            {
+                _qrRendered = await Js.InvokeAsync<bool>("wedding.makeQr", "wd-qr-target", qrText);
+            }
+            catch
+            {
+                _qrRendered = false; // không có QR vẫn còn đủ thông tin chữ + nút copy
+            }
             StateHasChanged();
         }
+    }
+
+    private static string RemoveDiacritics(string text)
+    {
+        var formD = text.Normalize(System.Text.NormalizationForm.FormD);
+        var sb = new System.Text.StringBuilder(formD.Length);
+        foreach (var c in formD)
+        {
+            if (System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c)
+                == System.Globalization.UnicodeCategory.NonSpacingMark) continue;
+            sb.Append(c switch { 'đ' => 'd', 'Đ' => 'D', _ => c });
+        }
+        return sb.ToString().Normalize(System.Text.NormalizationForm.FormC);
     }
 
     private async Task CopyAccountAsync()

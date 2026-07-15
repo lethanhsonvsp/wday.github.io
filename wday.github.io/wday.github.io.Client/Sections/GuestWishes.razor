@@ -56,15 +56,6 @@
                     <ValidationMessage For="() => _model.Content" class="wd-form-error" />
                 </div>
 
-                @* Mẫu câu gợi ý — chạm để dùng *@
-                <div class="wd-wish-samples">
-                    <span class="wd-wish-samples-label">Gợi ý nhanh:</span>
-                    @foreach (var sample in SampleWishes)
-                    {
-                        <button type="button" class="wd-wish-chip" @onclick="() => UseSample(sample)">@sample</button>
-                    }
-                </div>
-
                 <button type="submit" class="wd-submit-btn" disabled="@_sending">
                     @(_sending ? "Đang gửi…" : "Gửi lời chúc")
                 </button>
@@ -84,14 +75,6 @@
 
 @code {
     [Parameter] public string Slug { get; set; } = WeddingContent.Slug;
-
-    private static readonly string[] SampleWishes =
-    [
-        "Chúc hai bạn trăm năm hạnh phúc, đầu bạc răng long! 💕",
-        "Chúc mừng đám cưới! Mong hai bạn mãi yêu thương nhau như ngày đầu.",
-        "Chúc anh chị về chung một nhà luôn ngập tiếng cười và yêu thương.",
-        "Chúc hai vợ chồng son hạnh phúc viên mãn, sớm có tin vui!",
-    ];
 
     private const int LaneCount = 3;
 
@@ -127,12 +110,6 @@
         // Danh sách lời chúc load async sau khi trang render — tự observe lại
         // để các phần tử data-reveal mới xuất hiện có animation.
         await Js.InvokeVoidAsync("wedding.initReveal");
-    }
-
-    private void UseSample(string sample)
-    {
-        _model.Content = sample;
-        _profanity = false;
     }
 
     private async Task SubmitAsync()
