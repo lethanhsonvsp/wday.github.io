@@ -11,6 +11,11 @@
 # Cách dùng (trên máy Linux, tại thư mục repo):
 #   ./tunnel-linux.sh            # tự chạy app (nếu chưa) + mở tunnel
 #   PORT=8080 ./tunnel-linux.sh  # đổi port app
+#   PROTOCOL=http2 ./tunnel-linux.sh  # nếu mạng chặn UDP (QUIC) — dùng TCP
+#
+# Chạy trong VM (VMware/VirtualBox NAT) vẫn OK: bảng "CONNECTIVITY
+# PRE-CHECKS" có thể báo FAIL (báo động giả do NAT chặn probe), chỉ cần
+# thấy dòng "Registered tunnel connection" là tunnel đã sống.
 #
 # LƯU Ý: URL trycloudflare đổi mỗi lần chạy lại tunnel — hãy giữ
 # tunnel chạy liên tục trong thời gian mời khách (chạy trong tmux/screen).
@@ -87,4 +92,6 @@ echo ""
 echo "==> Đang mở tunnel... Tìm dòng https://XXXX.trycloudflare.com bên dưới,"
 echo "    gửi link đó (thêm /wedding/ngoc-nam-lan-anh) cho khách. Ctrl+C để dừng."
 echo ""
-"$CLOUDFLARED" tunnel --no-autoupdate --url "http://localhost:$PORT"
+"$CLOUDFLARED" tunnel --no-autoupdate \
+    ${PROTOCOL:+--protocol "$PROTOCOL"} \
+    --url "http://localhost:$PORT"
