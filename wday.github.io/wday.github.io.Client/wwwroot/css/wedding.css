@@ -272,10 +272,39 @@ a { color: inherit; }
     text-indent: .5em;
     color: var(--cream);
 }
-.wd-open-btn {
-    margin-top: 3rem;
-    min-height: 44px;
-    padding: .9rem 2.6rem;
+/* Nút mở thiệp — con dấu sáp mang monogram */
+.wd-seal-btn {
+    margin-top: 2.4rem;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.1rem;
+}
+.wd-seal {
+    width: 98px;
+    height: 98px;
+    display: grid;
+    place-items: center;
+    color: rgba(255, 255, 240, .92);
+    background: radial-gradient(circle at 32% 28%,
+        #D8B4B4 0%, #C9A0A0 38%, #A87F7F 74%, #96706F 100%);
+    border-radius: 47% 53% 51% 49% / 52% 48% 53% 47%; /* mép sáp không đều */
+    box-shadow:
+        inset 0 2px 6px rgba(255, 255, 255, .35),   /* bắt sáng mặt sáp */
+        inset 0 -4px 10px rgba(90, 60, 60, .45),    /* đổ bóng mép dưới */
+        0 12px 30px -10px rgba(0, 0, 0, .55);
+    transition: transform .5s var(--ease-out);
+    animation: wd-seal-pulse 3.4s ease-in-out infinite;
+}
+.wd-seal-btn:hover .wd-seal,
+.wd-seal-btn:focus-visible .wd-seal {
+    transform: scale(1.08) rotate(-4deg);
+}
+@keyframes wd-seal-pulse {
+    0%, 100% { scale: 1; }
+    50%      { scale: 1.04; }
+}
+.wd-seal-label {
     font-family: var(--font-sans);
     font-size: .72rem;
     font-weight: 500;
@@ -283,14 +312,8 @@ a { color: inherit; }
     text-indent: .4em;
     text-transform: uppercase;
     color: var(--ivory);
-    border: 1px solid rgba(255, 255, 240, .55);
-    background: rgba(255, 255, 240, .06);
-    backdrop-filter: blur(2px);
-    transition: background .4s, border-color .4s;
-}
-.wd-open-btn:hover {
-    background: rgba(255, 255, 240, .16);
-    border-color: var(--ivory);
+    border-bottom: 1px solid rgba(255, 255, 240, .45);
+    padding-bottom: .4rem;
 }
 
 /* ---- 7. Hero -------------------------------------------------- */
@@ -401,8 +424,15 @@ a { color: inherit; }
     gap: 1.6rem;
     align-items: center;
 }
+/* Khung vòm kiểu cửa sổ nhà thờ + viền kép vàng champagne */
+.wd-arch-frame {
+    border: 1px solid rgba(191, 155, 105, .55);
+    border-radius: 999px 999px 0 0;
+    padding: 10px;
+}
 .wd-person-photo {
     aspect-ratio: 3 / 4;
+    border-radius: 999px 999px 0 0;
 }
 .wd-person-photo img {
     width: 100%;
@@ -436,8 +466,8 @@ a { color: inherit; }
         gap: clamp(2.5rem, 6vw, 4.5rem);
     }
     /* Bố cục so le kiểu tạp chí: ảnh chú rể thấp hơn, cô dâu đảo chiều */
-    .wd-person--groom .wd-person-photo { margin-top: -2.5rem; }
-    .wd-person--bride .wd-person-photo { order: 2; margin-bottom: -2.5rem; }
+    .wd-person--groom .wd-arch-frame { margin-top: -2.5rem; }
+    .wd-person--bride .wd-arch-frame { order: 2; margin-bottom: -2.5rem; }
     .wd-person--bride .wd-person-text  { order: 1; text-align: right; }
     .wd-person--bride .wd-person-desc  { margin-left: auto; }
 }
@@ -498,10 +528,11 @@ a { color: inherit; }
     font-variant-numeric: tabular-nums;
     transition: opacity .3s;
 }
-.wd-count-num.tick { animation: wd-tick .45s var(--ease-out); }
-@keyframes wd-tick {
-    0% { opacity: .25; transform: translateY(.3rem); }
-    100% { opacity: 1; transform: none; }
+/* Số được tạo lại qua @key mỗi khi giá trị đổi → trượt xuống mềm mại */
+.wd-count-num { animation: wd-num-in .55s var(--ease-out); }
+@keyframes wd-num-in {
+    from { opacity: 0; transform: translateY(-.3em); }
+    to   { opacity: 1; transform: none; }
 }
 .wd-count-unit {
     font-family: var(--font-sans);
@@ -525,7 +556,12 @@ a { color: inherit; }
     gap: 1.8rem;
     align-items: center;
 }
-.wd-event-photo { aspect-ratio: 4 / 3; }
+.wd-event-photo {
+    aspect-ratio: 4 / 3;
+    outline: 1px solid rgba(191, 155, 105, .45); /* viền kép in offset */
+    outline-offset: 9px;
+    margin: 10px; /* chừa chỗ cho viền offset */
+}
 .wd-event-photo img {
     width: 100%; height: 100%;
     object-fit: cover;
@@ -574,8 +610,8 @@ a { color: inherit; }
     left: 0; bottom: 8px;
     width: 100%; height: 1px;
     background: var(--rose-deep);
-    transform: scaleX(.35);
-    transform-origin: left;
+    transform: scaleX(.3);
+    transform-origin: center; /* underline vẽ dần từ giữa ra hai phía */
     transition: transform .45s var(--ease-out);
 }
 .wd-map-link:hover::after { transform: scaleX(1); }
@@ -611,6 +647,21 @@ a { color: inherit; }
     position: relative;
     display: grid;
     gap: 1.5rem;
+}
+/* Năm khổng lồ mờ sau ảnh — ghost number kiểu tạp chí */
+.wd-milestone-ghost {
+    position: absolute;
+    z-index: 0;
+    top: -3rem;
+    right: -.4rem;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(5.5rem, 17vw, 11rem);
+    line-height: 1;
+    color: rgba(74, 64, 56, .06);
+    letter-spacing: -.02em;
+    pointer-events: none;
+    user-select: none;
 }
 .wd-milestone-photo {
     aspect-ratio: 4 / 3;
@@ -671,6 +722,9 @@ a { color: inherit; }
         transform: translate(-50%, -50%);
         z-index: 1;
     }
+    /* Ghost number nằm phía bên chữ, đối xứng so le theo ảnh */
+    .wd-milestone:nth-child(odd)  .wd-milestone-ghost { right: -1rem; top: -4rem; }
+    .wd-milestone:nth-child(even) .wd-milestone-ghost { left: -1rem; right: auto; top: -4rem; }
     /* Ảnh lệch nhẹ, xen kẽ trái phải — cảm giác scrapbook */
     .wd-milestone:nth-child(odd)  .wd-milestone-photo { transform: rotate(-1.2deg); margin-right: clamp(1rem, 4vw, 2.5rem); }
     .wd-milestone:nth-child(even) .wd-milestone-photo { order: 2; transform: rotate(1.2deg); margin-left: clamp(1rem, 4vw, 2.5rem); }
@@ -882,9 +936,23 @@ a { color: inherit; }
     text-transform: uppercase;
     color: var(--warm-white);
     background: var(--ink);
-    transition: background .4s, transform .4s;
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
 }
-.wd-submit-btn:hover { background: var(--rose-deep); }
+/* Hover editorial: màu hồng quét từ trái sang */
+.wd-submit-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--rose-deep);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .5s var(--ease-out);
+}
+.wd-submit-btn:hover::before,
+.wd-submit-btn:focus-visible::before { transform: scaleX(1); }
 .wd-submit-btn:disabled { opacity: .55; cursor: wait; }
 
 /* Thông báo thành công — thay cho alert() */
@@ -1042,9 +1110,25 @@ a { color: inherit; }
     text-transform: uppercase;
     border: 1px solid var(--ink);
     color: var(--ink);
-    transition: background .4s, color .4s;
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+    transition: color .45s;
 }
-.wd-gift-btn:hover { background: var(--ink); color: var(--warm-white); }
+.wd-gift-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--ink);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .5s var(--ease-out);
+}
+.wd-gift-btn:hover,
+.wd-gift-btn:focus-visible { color: var(--warm-white); }
+.wd-gift-btn:hover::before,
+.wd-gift-btn:focus-visible::before { transform: scaleX(1); }
 
 /* Modal tự viết */
 .wd-modal-backdrop {
@@ -1220,7 +1304,6 @@ a { color: inherit; }
     100% { transform: translate3d(calc(var(--sway, 4vw) * -.3), 110vh, 0) rotate(1.15turn); }
 }
 
-/* ---- 21. NotFound ------------------------------------------------------------------- */
 .wd-notfound {
     min-height: 100svh;
     display: grid;
@@ -1245,4 +1328,10 @@ a { color: inherit; }
     #wd-petals { display: none; }
     .wd-ticker-track { animation: none; }
     .wd-ticker-lane { overflow-x: auto; } /* vẫn đọc được bằng cách kéo ngang */
+    .wd-letter { animation: none; opacity: 1; }
+    .wd-count-num { animation: none; }
+    .wd-seal { animation: none; }
+    .wd-gold-text,
+    .wd-hero-names .amp,
+    .wd-opening-names .amp { animation: none; }
 }

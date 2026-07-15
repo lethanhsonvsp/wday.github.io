@@ -1,15 +1,37 @@
-@* Section 2 — Hero toàn màn hình *@
+@* Section 2 — Hero toàn màn hình, tên hiện từng chữ cái *@
 
 <section class="wd-hero">
     <img src="@WeddingImages.Hero" alt="Ảnh cưới @WeddingContent.CoupleNames" fetchpriority="high" />
     <div class="wd-hero-content" data-reveal="fade-in">
         <div class="wd-label">The Wedding Of</div>
         <h1 class="wd-hero-names">
-            Ngọc Nam
-            <span class="amp">&amp;</span>
-            Lan Anh
+            <span class="wd-letters">@RenderLetters(WeddingContent.GroomName, 0)</span>
+            <span class="amp wd-gold-text">&amp;</span>
+            <span class="wd-letters">@RenderLetters(WeddingContent.BrideName, WeddingContent.GroomName.Length + 2)</span>
         </h1>
         <div class="wd-hero-date">@WeddingContent.DateDisplayEn</div>
     </div>
     <div class="wd-scroll-hint">Cuộn xuống</div>
 </section>
+
+@code {
+    // Tách tên thành từng ký tự, mỗi ký tự trễ dần (--i) để hiện lần lượt
+    private static RenderFragment RenderLetters(string text, int offset) => builder =>
+    {
+        var seq = 0;
+        for (var i = 0; i < text.Length; i++)
+        {
+            var ch = text[i];
+            if (ch == ' ')
+            {
+                builder.AddContent(seq++, " ");
+                continue;
+            }
+            builder.OpenElement(seq++, "span");
+            builder.AddAttribute(seq++, "class", "wd-letter");
+            builder.AddAttribute(seq++, "style", $"--i:{offset + i}");
+            builder.AddContent(seq++, ch);
+            builder.CloseElement();
+        }
+    };
+}

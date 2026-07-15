@@ -6,20 +6,21 @@
         <div class="wd-label" data-reveal="fade-up">Cùng đếm ngược đến ngày chung đôi</div>
 
         <div class="wd-countdown-grid" data-reveal="fade-up" data-delay="1">
+            @* @key: giá trị đổi → phần tử được tạo lại → animation lật mềm tự chạy *@
             <div class="wd-count-cell">
-                <div class="wd-count-num">@_days</div>
+                <div class="wd-count-num" @key="@("d" + _days)">@_days</div>
                 <div class="wd-count-unit">Days</div>
             </div>
             <div class="wd-count-cell">
-                <div class="wd-count-num">@_hours</div>
+                <div class="wd-count-num" @key="@("h" + _hours)">@_hours</div>
                 <div class="wd-count-unit">Hours</div>
             </div>
             <div class="wd-count-cell">
-                <div class="wd-count-num">@_minutes</div>
+                <div class="wd-count-num" @key="@("m" + _minutes)">@_minutes</div>
                 <div class="wd-count-unit">Minutes</div>
             </div>
             <div class="wd-count-cell">
-                <div class="wd-count-num @(_tick ? "tick" : null)">@_seconds</div>
+                <div class="wd-count-num" @key="@("s" + _seconds)">@_seconds</div>
                 <div class="wd-count-unit">Seconds</div>
             </div>
         </div>
@@ -28,7 +29,6 @@
 
 @code {
     private string _days = "—", _hours = "—", _minutes = "—", _seconds = "—";
-    private bool _tick;
     private System.Threading.Timer? _timer;
 
     protected override void OnInitialized()
@@ -50,7 +50,6 @@
         _hours = remaining.Hours.ToString("00");
         _minutes = remaining.Minutes.ToString("00");
         _seconds = remaining.Seconds.ToString("00");
-        _tick = !_tick; // đổi class để chạy lại animation nhẹ mỗi giây
     }
 
     public void Dispose() => _timer?.Dispose();

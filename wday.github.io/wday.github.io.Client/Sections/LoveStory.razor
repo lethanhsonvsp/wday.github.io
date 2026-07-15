@@ -9,6 +9,8 @@
             @foreach (var m in WeddingContent.LoveStory)
             {
                 <article class="wd-milestone">
+                    @* Năm khổng lồ mờ phía sau — kiểu tạp chí thời trang *@
+                    <div class="wd-milestone-ghost" aria-hidden="true">@m.Year</div>
                     <div class="wd-milestone-photo wd-image-reveal" data-reveal="fade-in">
                         <img src="@m.Image" alt="@m.Title" loading="lazy" />
                     </div>

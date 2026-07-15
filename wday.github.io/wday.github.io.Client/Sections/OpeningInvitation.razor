@@ -10,7 +10,13 @@
             <span>@WeddingContent.BrideName</span>
         </h1>
         <div class="wd-opening-date">@WeddingContent.DateDisplay</div>
-        <button type="button" class="wd-open-btn" @onclick="OpenAsync">Mở thiệp</button>
+        @* Con dấu sáp mang monogram — nhấn để "bóc dấu" mở thiệp *@
+        <button type="button" class="wd-seal-btn" @onclick="OpenAsync">
+            <span class="wd-seal">
+                <WeddingMonogram Size="58" />
+            </span>
+            <span class="wd-seal-label">Mở thiệp</span>
+        </button>
     </div>
 </div>
 
